@@ -1,0 +1,8 @@
+*
+
+# But not these files...
+!.gitignore
+!sart.js
+!*.sh
+!*.shell
+!*.conf

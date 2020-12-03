@@ -3,7 +3,7 @@ from starlette.config import environ
 from starlette.testclient import TestClient
 from app.db.mongodb import get_database
 from app.core.config import database_name, users_collection_name
-
+import pyyaml
 
 @fixture(scope="session")
 def test_user():

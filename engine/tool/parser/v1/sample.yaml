@@ -19,17 +19,19 @@ tools:
   # permissions:
   #   tool:tag
   output:
-    type: array # array , object , file , url , link , embedded_package ( A zip file with static content & index.html )
+    type: array # array , object , file , url , embedded_package ( A zip file with static content & index.html )
     schema:
       test_field:
         id: 'heello'
+        datatype: string # string | enum | number | url | file | severity `info|low|medium|high|critical` | severity_status `confirmed | unconfirmed | info | noise` | severity_type `new | redundant `  | date | timestamp
         default: ''
         primary: true # Unique & Primary Index
         unique: true # Must be unique
-        required: true
-        index: true # true / false
+        optional: true
+        indexed: true # true / false
         alias: 'Test Field'
-        type: string # string | enum | number | url | file | severity `info|low|medium|high|critical` | severity_status `confirmed | unconfirmed | info | noise` | severity_type `new | redundant ` 
+        meta:
+            hello: world
         enum:
           - OPTION_1
           - OPTION_2
@@ -39,6 +41,3 @@ tools:
           - tag_1
           - tag_2
           - tag_3
-        meta:
-          meta_data:
-            hello: world

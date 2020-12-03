@@ -2,8 +2,6 @@
 import yaml
 import enum
 import logging
-# Using enum class create enumerations
-
 
 
 class OutputSchemaTypes(enum.Enum):
@@ -12,7 +10,6 @@ class OutputSchemaTypes(enum.Enum):
     FILE = "file"
     URL = "url"
     EMBEDDED_PACKAGE = "embedded_package"
-
 
 
 class ToolType(enum.Enum):
@@ -101,8 +98,30 @@ class ToolYaml():
         # Parse result schema
         logging.info("Parsing Output Schema")
         output = tools["output"]
+        schema = output["schema"]
 
-        print(output)
+        for key, value in zip(schema.keys(), schema.values()):
+
+            identifier = value.get("id", key)
+            datatype = value.get("datatype", "string")
+            default = value.get("default", "")
+            primary = value.get("primary", False)
+            unique = value.get("unique", False)
+            optional = value.get("optional", True)
+            indexed = value.get("indexed", False)
+            alias = value.get("alias", key)
+            meta = value.get("meta", {})
+
+            print(identifier)
+            print(datatype)
+            print(default)
+            print(primary)
+            print(unique)
+            print(optional)
+            print(indexed)
+            print(alias)
+            print(meta)
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)

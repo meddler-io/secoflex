@@ -63,15 +63,14 @@ class AssetType(str, Enum):
     ANDROID = 'android'
     IOS = 'ios'
     WEB = 'web'
-    REPOSITORY = 'code_repository'
-    DOCKER = 'docker_image'
+    REPOSITORY = 'repository'
+    DOCKER = 'docker'
 
 
 class AssetSchema(DBModelMixin):
     tyoe: AssetType
     name: str = ""
     identifier: str = ""
-    value: str
     doc: Optional[datetime] = datetime.utcnow()
     dou: Optional[datetime] = datetime.utcnow()
     active: Optional[bool] = True
@@ -201,3 +200,45 @@ class IosdAssetSchemaResponse(RWModel ):
     dou: Optional[datetime] = datetime.utcnow()
     group: Optional[str]
 
+
+# REPOSITORY
+class RepositoryAssetSchema(RWModel, AssetSchema):
+    tyoe = AssetType.REPOSITORY
+    credential_type: str
+    url: str
+    credentials: Any
+
+
+class RepositoryAssetSchemaResponse(RWModel ):
+    tyoe: AssetType
+    identifier: Optional[str]
+    tyoe = AssetType.REPOSITORY
+    credential_type: str
+    url: str
+    name: str
+    credentials: Any
+    doc: Optional[datetime] = datetime.utcnow()
+    dou: Optional[datetime] = datetime.utcnow()
+    group: Optional[str]
+
+
+# DOCKER
+class DockerAssetSchema(RWModel, AssetSchema):
+    tyoe = AssetType.DOCKER
+    credential_type: str
+    url: str
+    name: str
+    credentials: Any
+
+
+class DockerAssetSchemaResponse(RWModel ):
+    tyoe: AssetType
+    identifier: Optional[str]
+    tyoe = AssetType.REPOSITORY
+    credential_type: str
+    url: str
+
+    credentials: Any
+    doc: Optional[datetime] = datetime.utcnow()
+    dou: Optional[datetime] = datetime.utcnow()
+    group: Optional[str]

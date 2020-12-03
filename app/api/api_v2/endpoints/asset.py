@@ -7,17 +7,21 @@ from fastapi import FastAPI, File, UploadFile, Query
 from ....core.jwt import get_current_user_authorizer
 from ....db.mongodb import AsyncIOMotorClient, get_database
 from starlette.responses import FileResponse
-from ....models.asset_schema import HostAssetSchema , HostAssetSchemaResponse , DomainAssetSchema , DomainAssetSchemaResponse , WebAssetSchema , WebAssetSchemaResponse , AndroidAssetSchema , AndroidAssetSchemaResponse, IosAssetSchema , IosdAssetSchemaResponse
+from ....models.asset_schema import HostAssetSchema, HostAssetSchemaResponse, DomainAssetSchema, DomainAssetSchemaResponse, WebAssetSchema, WebAssetSchemaResponse, AndroidAssetSchema, AndroidAssetSchemaResponse, IosAssetSchema, IosdAssetSchemaResponse, RepositoryAssetSchema, RepositoryAssetSchemaResponse, DockerAssetSchema, DockerAssetSchemaResponse
 from ....crud.asset_host_schema import create_host_asset, get_host_asset, get_all_host_asset
 from ....crud.asset_domain_schema import create_domain_asset, get_all_domain_asset
 from ....crud.asset_web_schema import create_web_asset, get_all_web_asset, get_web_asset
 from ....crud.asset_android_schema import create_android_asset, get_all_android_asset, get_android_asset
 from ....crud.asset_ios_schema import create_ios_asset, get_all_ios_asset, get_ios_asset
+from ....crud.asset_repository_schema import create_repository_asset, get_all_repository_asset, get_repository_asset
+from ....crud.asset_docker_schema import create_docker_asset, get_all_docker_asset, get_docker_asset
 
 router = APIRouter()
 
 # Host
 # Create an asset
+
+
 @router.post("/asset/host", response_model=HostAssetSchemaResponse, tags=["asset"])
 async def create_asset_host_api(
     hostAssetSchema: HostAssetSchema = Body(...,),
@@ -95,7 +99,7 @@ async def create_asset_android_api(
     db: AsyncIOMotorClient = Depends(get_database),
 ):
     response = await create_android_asset(db, asset)
-    return response
+    return responsemo
 
 
 # Create an Android
@@ -126,4 +130,46 @@ async def get_asset_ios_api(
 ):
 
     response = await get_all_ios_asset(db)
+    return response
+
+
+# Repository
+# Create an Repository
+@router.post("/asset/repository", response_model=RepositoryAssetSchemaResponse, tags=["repository"])
+async def create_asset_repository_api(
+    asset: RepositoryAssetSchema = Body(...,),
+    db: AsyncIOMotorClient = Depends(get_database),
+):
+    response = await create_repository_asset(db, asset)
+    return response
+
+
+# Create an Repository
+@router.get("/asset/repository", tags=["repository"])
+async def get_asset_repository_api(
+    db: AsyncIOMotorClient = Depends(get_database),
+):
+
+    response = await get_all_repository_asset(db)
+    return response
+
+
+# Docker
+# Create an Docker
+@router.post("/asset/docker", response_model=DockerAssetSchemaResponse, tags=["docker"])
+async def create_asset_docker_api(
+    asset: DockerAssetSchema = Body(...,),
+    db: AsyncIOMotorClient = Depends(get_database),
+):
+    response = await create_docker_asset(db, asset)
+    return response
+
+
+# Create an Docker
+@router.get("/asset/docker", tags=["docker"])
+async def get_asset_docker_api(
+    db: AsyncIOMotorClient = Depends(get_database),
+):
+
+    response = await get_all_docker_asset(db)
     return response

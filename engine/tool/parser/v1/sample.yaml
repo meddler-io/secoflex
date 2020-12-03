@@ -1,0 +1,44 @@
+version: '1'
+tools:
+  name: 
+  type: dockerfile # dockerfile, zip , tar, image
+  image: .
+  credentials:
+    repository: 'https://path_private_to_docker_repository'
+    user: 'admin'
+    password: 'password'
+
+  # retenstion_policy
+  #   upsert
+  #   update
+  #   insert
+  # logging_policy: stdout, stderr
+  # dependencies:
+  #   tool:tag
+
+  # permissions:
+  #   tool:tag
+  output:
+    type: array # array , object , file , url , link , embedded_package ( A zip file with static content & index.html )
+    schema:
+      test_field:
+        id: 'heello'
+        default: ''
+        primary: true # Unique & Primary Index
+        unique: true # Must be unique
+        required: true
+        index: true # true / false
+        alias: 'Test Field'
+        type: string # string | enum | number | url | file | severity `info|low|medium|high|critical` | severity_status `confirmed | unconfirmed | info | noise` | severity_type `new | redundant ` 
+        enum:
+          - OPTION_1
+          - OPTION_2
+          - OPTION_3
+          - OPTION_4
+        tags:
+          - tag_1
+          - tag_2
+          - tag_3
+        meta:
+          meta_data:
+            hello: world

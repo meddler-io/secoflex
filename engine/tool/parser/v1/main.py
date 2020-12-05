@@ -17,6 +17,7 @@ class ToolType(enum.Enum):
     Zip = "zip"
     Tar = "tar"
     Image = "image"
+    Git = "git"
 
 
 class BaseToolContext():

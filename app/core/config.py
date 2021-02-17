@@ -18,8 +18,17 @@ SECRET_KEY = Secret(os.getenv("SECRET_KEY", "secret key for project"))
 PROJECT_NAME = os.getenv("PROJECT_NAME", "FastAPI example application")
 ALLOWED_HOSTS = CommaSeparatedStrings(os.getenv("ALLOWED_HOSTS", ""))
 
+# MessageQ Topics
+MQ_TOOLBUILDER_QUEUE = os.getenv("MQ_TOOLBUILDER_QUEUE", "MQ_TOOLBUILDER_QUEUE")  # deploying without docker-compose
+
+
 MONGODB_URL = os.getenv("MONGODB_URL", "")  # deploying without docker-compose
 FILESTORAGE_PATH = os.getenv("FILESTORAGE_PATH", "/tmp/")  # deploying without docker-compose
+MINIO_URL = os.getenv("MINIO_URL", "192.168.29.5:9000")  # deploying without docker-compose
+MINIO_ACCESSKEY = os.getenv("MINIO_ACCESSKEY", "MEDDLER")  # deploying without docker-compose
+MINIO_SECRET = os.getenv("MINIO_SECRET", "SUPERDUPERSECRET")  # deploying without docker-compose
+MINIO_REGION = os.getenv("MINIO_REGION", "meddler")  # deploying without docker-compose
+
 
 if not MONGODB_URL:
     MONGO_HOST = os.getenv("MONGO_HOST", "localhost")
@@ -66,5 +75,15 @@ asset_repository_collection_name = "asset_repository"
 asset_docker_collection_name = "asset_docker"
 
 
+# Tools
+tools_collection_name = "tools"
+build_collection_name = "builds"
+build_executor_collection_name = "builds_executor"
+
+
+# Webhooks
+API_PREFIX_WEBHOOK = "http://192.168.29.6:8000/api/v2"
+SUCCESS_EXECUTION_WEBHOOK = f"{API_PREFIX_WEBHOOK}/result/success/%s"
+FAILURE_EXECUTION_WEBHOOK = f"{API_PREFIX_WEBHOOK}/result/failure/%s"
 
 

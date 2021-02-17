@@ -16,6 +16,7 @@ from ....crud.asset_ios_schema import create_ios_asset, get_all_ios_asset, get_i
 from ....crud.asset_repository_schema import create_repository_asset, get_all_repository_asset, get_repository_asset
 from ....crud.asset_docker_schema import create_docker_asset, get_all_docker_asset, get_docker_asset
 
+
 router = APIRouter()
 
 # Host
@@ -173,3 +174,4 @@ async def get_asset_docker_api(
 
     response = await get_all_docker_asset(db)
     return response
+

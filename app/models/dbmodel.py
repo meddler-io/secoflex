@@ -5,7 +5,6 @@ from pydantic import BaseModel, Schema, Field
 from bson import ObjectId as BsonObjectId
 
 
-
 class ObjectId(BsonObjectId):
     @classmethod
     def __get_validators__(cls):
@@ -25,6 +24,6 @@ class DateTimeModelMixin(BaseModel):
 
 
 class DBModelMixin(DateTimeModelMixin):
-    id: Optional[int]
-    # id: Optional[ObjectId] = Schema(None, alias="_id")
+    # id: Optional[int]
+    id: Optional[ObjectId] = Schema(None, alias="_id")
     

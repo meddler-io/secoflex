@@ -3,7 +3,6 @@ from starlette.exceptions import HTTPException
 from starlette.middleware.cors import CORSMiddleware
 from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 
-from .api.api_v1.api import router as api_router
 from .api.api_v2.api import router as api_router_v2
 from .core.config import ALLOWED_HOSTS, API_V1_STR, PROJECT_NAME
 from .core.errors import http_422_error_handler, http_error_handler

@@ -4,7 +4,7 @@
 from typing import Union
 from pydantic.fields import Schema
 from pydantic.main import BaseModel
-from app.models.tool.build.common import AuthType , AuthNone, AuthCredentials, AuthToken, AuthSsh, BuildType
+from app.models.tool.build.common import BaseBuildModel, AuthType , AuthNone, AuthCredentials, AuthToken, AuthSsh, BuildType
 
 
 class DockerfileAuthNone(BaseModel):
@@ -20,9 +20,11 @@ class DockerfileBuild(BaseModel):
     config: DockerfileBuildConfig
 
 
-class DockerfileUrlInBase(BaseModel):
+class DockerfileUrlInBase(BaseBuildModel):
     auth: Union[DockerfileAuthNone]
     build: DockerfileBuild
+    refrence_id: str
+
 
 
 class DockerfileUrlInDB(DockerfileUrlInBase):

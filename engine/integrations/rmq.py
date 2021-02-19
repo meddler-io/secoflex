@@ -63,7 +63,7 @@ class Rmq:
         await channel.default_exchange.publish(
             aio_pika.Message(body="{}".format(data).encode()),
             routing_key=routing_key,
-            timeout=1
+            timeout=4
 
         )
         return True

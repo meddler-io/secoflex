@@ -1,4 +1,8 @@
+# from app.models.mongo_id import ObjectId
+from app.models.tool.builds import BuildMessageSpec
+from app.models.dbmodel import DBModelMixin, ObjectId
 from typing import Optional, List, Dict
+
 from fastapi.exceptions import HTTPException
 from google.auth.environment_vars import CREDENTIALS
 from pydantic import Schema, validator
@@ -55,4 +59,25 @@ class BuildType(str, Enum):
     BUNDLE_URL = 'bundle_url'
     BUNDLE_UPLOAD = 'bundle_upload'
     DOCKERFILE = 'dockerfile'
+
+
+
+class BaseAuthModel(BaseModel):
+    mode: AuthType
+    auth: Any
+
+
+class BaseBuildConfigModel(BaseModel):
+    type: BuildType
+    config: Any
+
+
+class BaseBuildModel(DBModelMixin):
+    auth: BaseAuthModel
+    build: BaseBuildConfigModel
+    refrence_id: str
+    build_config: Optional[BuildMessageSpec]
+
+
+
 

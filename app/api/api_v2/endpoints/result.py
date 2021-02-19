@@ -36,7 +36,6 @@ async def api_cresult_on_success(
         status: Optional[str] = Header("default_status"),
         message: Optional[str] = Header("default_message"),
         db: AsyncIOMotorClient = Depends(get_database),
-        data=Body(...,),
 ):
 
     print("status", status)

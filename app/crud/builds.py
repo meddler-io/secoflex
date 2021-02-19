@@ -1,3 +1,6 @@
+from app.models.tool.builds import BuildMessageSpec
+from app.models.tool.build.common import BaseBuildModel, BuildType
+
 from app.models.tool.executor import BuildExecutorInDb, BuildExecutorInRequest, BuildExecutorInResponse
 from logging import log
 import logging
@@ -7,11 +10,7 @@ from slugify import slugify
 from datetime import datetime
 from typing import Union
 import pymongo
-from ..models.tool.builds import (
-    BaseBuildInResponse, BuildConfig, BuildMessageSpec, BuildType,
-    RegistryPrivateInReq, RegistryPrivateInResp, RegistryPublicInDB,
-    RegistryPublicInResp, RegistryPublicInReq, BaseBuildType
-)
+
 
 from ..db.mongodb import AsyncIOMotorClient
 from ..core.config import (
@@ -23,21 +22,40 @@ from ..core.config import (
 
 
 # Build
-async def create_build(client: AsyncIOMotorClient, build_type: BuildType, build:  Union[RegistryPublicInReq, RegistryPrivateInReq]) -> Union[RegistryPublicInResp, RegistryPrivateInResp]:
+# async def create_build(client: AsyncIOMotorClient, build_type: BuildType, build:  Union[RegistryPublicInReq, RegistryPrivateInReq]) -> Union[RegistryPublicInResp, RegistryPrivateInResp]:
 
+#     collection = client[database_name][coll_name]
+
+#     if build_type == BuildType.REGISTRY_PUBLIC:
+#         data = RegistryPublicInDB(**build.dict()).dict()
+#         result = await collection.insert_one(data)
+#         return await collection.find_one({"_id": result.inserted_id})
+
+#     elif build_type == BuildType.REGISTRY_PRIVATE:
+#         data = RegistryPrivateInReq(**build.dict()).dict()
+#         result = await collection.insert_one(data)
+#         return await collection.find_one({"_id": result.inserted_id})
+
+#     return {}
+
+async def create_build(client: AsyncIOMotorClient, build:  Any) -> any:
     collection = client[database_name][coll_name]
+    data = build.dict()
+    result = await collection.insert_one(data)
+    result = await collection.find_one({"_id": result.inserted_id})
 
-    if build_type == BuildType.REGISTRY_PUBLIC:
-        data = RegistryPublicInDB(**build.dict()).dict()
-        result = await collection.insert_one(data)
-        return await collection.find_one({"_id": result.inserted_id})
+    result["_id"] = str(result["_id"])
+    return result
 
-    elif build_type == BuildType.REGISTRY_PRIVATE:
-        data = RegistryPrivateInReq(**build.dict()).dict()
-        result = await collection.insert_one(data)
-        return await collection.find_one({"_id": result.inserted_id})
 
-    return {}
+async def edit_build(client: AsyncIOMotorClient, id: str, build:  Any) -> any:
+    collection = client[database_name][coll_name]
+    _id = ObjectId(id)
+    data = build.dict()
+    result = await collection.update_one({"_id": _id},  {"$set": data})
+    result = await collection.find_one({"_id": _id})
+    result["_id"] = str(result["_id"])
+    return result
 
 # Build
 
@@ -47,7 +65,7 @@ async def get_all_build(client: AsyncIOMotorClient, tool_id: str) -> Any:
     collection = client[database_name][coll_name]
     rows = collection.find({"refrence_id": tool_id})
 
-    result: List[RegistryPrivateInReq] = []
+    result: List[Any] = []
 
     async for row in rows:
         row["_id"] = str(row["_id"])
@@ -58,22 +76,22 @@ async def get_all_build(client: AsyncIOMotorClient, tool_id: str) -> Any:
     return result
 
 
-async def get_build(client: AsyncIOMotorClient, build_id: str) -> BaseBuildInResponse:
+async def get_build(client: AsyncIOMotorClient, build_id: str) -> BaseBuildModel:
 
     collection = client[database_name][coll_name]
     result = await collection.find_one({"_id": ObjectId(build_id)})
-    result = BaseBuildInResponse(**result)
-
+    result = BaseBuildModel(**result)
     return result
 
 
 async def get_build_config(client: AsyncIOMotorClient, build_id: str) -> BuildMessageSpec:
 
     result = await get_build(client, build_id)
-    return result.build_config
+    result = result.build_config
+    return result
 
 
-async def update_build_config(client: AsyncIOMotorClient,  build_id: str, build_config: BuildMessageSpec) -> BaseBuildInResponse:
+async def update_build_config(client: AsyncIOMotorClient,  build_id: str, build_config: BuildMessageSpec) -> Any:
 
     collection = client[database_name][coll_name]
     result = await collection.update_one({"_id": ObjectId(build_id)},  {"$set": {"build_config": build_config.dict()}})

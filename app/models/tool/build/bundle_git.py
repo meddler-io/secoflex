@@ -3,7 +3,7 @@
 from typing import Union
 from pydantic.fields import Schema
 from pydantic.main import BaseModel
-from app.models.tool.build.common import AuthType, AuthNone, AuthCredentials, AuthToken, AuthSsh, BuildType
+from app.models.tool.build.common import AuthType, AuthNone, AuthCredentials, AuthToken, AuthSsh, BaseBuildModel, BuildType
 
 
 class GitAuthNone(BaseModel):
@@ -35,9 +35,12 @@ class GitBuild(BaseModel):
     config: GitBuildConfig
 
 
-class GitUrlInBase(BaseModel):
+
+class GitUrlInBase(BaseBuildModel):
     auth: Union[GitAuthNone, GitAuthCredentials, GitAuthSsh, GitAuthToken ]
     build: GitBuild
+    refrence_id: str
+
 
 
 class GitUrlInDB(GitUrlInBase):

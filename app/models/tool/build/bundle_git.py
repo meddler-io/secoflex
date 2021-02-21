@@ -39,7 +39,6 @@ class GitBuild(BaseModel):
 class GitUrlInBase(BaseBuildModel):
     auth: Union[GitAuthNone, GitAuthCredentials, GitAuthSsh, GitAuthToken ]
     build: GitBuild
-    refrence_id: str
 
 
 

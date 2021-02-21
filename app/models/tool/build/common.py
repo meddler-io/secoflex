@@ -1,4 +1,6 @@
 # from app.models.mongo_id import ObjectId
+from app.models.tool.tool import ToolInResp
+from app.models.mongo_id import ObjectIdInReq
 from app.models.tool.builds import BuildMessageSpec
 from app.models.dbmodel import DBModelMixin, ObjectId
 from typing import Optional, List, Dict
@@ -75,9 +77,17 @@ class BaseBuildConfigModel(BaseModel):
 class BaseBuildModel(DBModelMixin):
     auth: BaseAuthModel
     build: BaseBuildConfigModel
-    refrence_id: str
+    refrence_id: ObjectId = Schema(None, alias="refrence_id")
     build_config: Optional[BuildMessageSpec]
 
+class BaseBuildModelInResponse(BaseBuildModel):
+    pass
+
+class BaseBuildModelInRequest(BaseBuildModel):
+    pass
+
+class BaseBuildWithToolModelInResponse(BaseBuildModel):
+    tool: ToolInResp
 
 
 

@@ -1,9 +1,10 @@
 
 
+from app.models.dbmodel import ObjectId
 from typing import Union
 from pydantic.fields import Schema
 from pydantic.main import BaseModel
-from app.models.tool.build.common import AuthType, AuthNone, AuthCredentials, AuthToken, AuthSsh, BaseBuildModel, BuildType
+from app.models.tool.build.common import AuthType, AuthNone, AuthCredentials, AuthToken, AuthSsh, BaseBuildModel, BaseBuildModelInResponse, BuildType
 
 
 class DockerPrivateAuthNone(BaseModel):
@@ -27,10 +28,10 @@ class DockerPrivateBuild(BaseModel):
     config: DockerPrivateBuildConfig
 
 
-class DockerPrivateUrlInBase(BaseBuildModel):
+class DockerPrivateUrlInBase(BaseBuildModelInResponse):
     auth: Union[DockerPrivateAuthNone, DockerPrivateAuthCredentials ]
     build: DockerPrivateBuild
-    refrence_id: str
+    
 
 
 

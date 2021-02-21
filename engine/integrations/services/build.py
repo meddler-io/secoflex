@@ -1,6 +1,7 @@
 # Run / Execute Build
 
 
+import logging
 from app.models.tool.builds import AuthType
 from app.models.tool import build
 from app.models.tool.build.common import BaseBuildModel, BuildType
@@ -20,10 +21,12 @@ def parseBuild(build_from_db: BaseBuildModel):
     env = {
 
     }
+    
     env["base_path"] = "/kaniko/fs"
     env["input_dir"] = "/input"
 
     result = build_from_db
+
 
     if result.build.type == BuildType.REGISTRY_PUBLIC:
         build = public_registry.DockerPublicUrlInDB(**result.dict())
@@ -36,6 +39,7 @@ def parseBuild(build_from_db: BaseBuildModel):
 
         pass
     elif result.build.type == BuildType.BUNDLE_GIT:
+        
         build = bundle_git.GitUrlInDB(**result.dict())
         env["BUILDCONTEXT"] = build.build.config.repository_url
         if build.auth.mode == AuthType.NONE:
@@ -52,6 +56,8 @@ def parseBuild(build_from_db: BaseBuildModel):
                 f"Unspported Operation: Build via {build.auth.mode} using unknown 'authmode': {build.auth.mode}")
 
         pass
+
+        
     elif result.build.type == BuildType.BUNDLE_UPLOAD:
         build = bundle_upload.BundleUploadInDB(**result.dict())
         # args["build_context"] =  build.build.config.get_object_path()
@@ -75,8 +81,8 @@ def parseBuild(build_from_db: BaseBuildModel):
     else:
         pass
 
-    print(build)
-
+    
+    
     return {
         "args": args,
         "env": env

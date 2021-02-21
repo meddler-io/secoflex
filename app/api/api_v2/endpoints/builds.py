@@ -1,3 +1,4 @@
+import traceback 
 from engine.integrations.services.build import parseBuild
 from app.models.tool.build.common import BaseBuildModel
 from app.models.tool.build.bundle_upload import BundleUploadInBase
@@ -105,7 +106,7 @@ async def api_run_build(
         build_config = await get_build_config(db,  id)
 
         Config = await create_build_executor(db, id, build_config)
-
+        print("Tag", Config.id)
         Config.cmd = "/kaniko/executor"
         Config.success_endpoint = SUCCESS_EXECUTION_WEBHOOK % Config.id
         Config.failure_endpoint = FAILURE_EXECUTION_WEBHOOK % Config.id
@@ -116,8 +117,10 @@ async def api_run_build(
         # Config.config.system["DOCKER_CONFIG"] = "/kaniko/fs/input/configmaps/"
         Config.environ["DOCKER_CONFIG"] = "$input_dir/configmaps/"
 
+        # Substutute env variables
+        for key in result["env"]:
+            Config.environ[key] = result["env"][key]
 
-        
         BuildContext = result["env"]["BUILDCONTEXT"]
         Config.substitute_var = True
         Config.variables = {
@@ -137,8 +140,12 @@ async def api_run_build(
         ]
 
         Config.args = ["--context=" + f"{BuildContext}",
-                       "--destination=rounak316/hello:test",
-                       "-v", "debug"
+                       f"--destination=192.168.29.5:5000/rounak316/hello:{Config.id}",
+                       "--cache=false",
+                       "--cleanup",
+
+
+
                        ]
 
         print("SUCCESS_EXECUTION_WEBHOOK", Config.success_endpoint)
@@ -146,6 +153,7 @@ async def api_run_build(
 
         # result = await rmq.RMQ.publish("tasks_test",  Config.json() )
         # print('result', result)
+        print("Config", Config.json())
         result = await asyncio.wait_for(rmq.RMQ.publish("tasks_test",  Config.json()), timeout=10)
 
         return Config
@@ -163,6 +171,8 @@ async def api_run_build(
         await asyncio.wait_for(rmq.RMQ.publish("tasks_test",  config.json()), timeout=4)
         return config
     except Exception as err:
+        print(err)
+        traceback.print_exc() 
         return {"error": str(err)}
 
     return True

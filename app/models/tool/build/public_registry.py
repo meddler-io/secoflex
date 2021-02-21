@@ -4,7 +4,7 @@ from app.models.mongo_id import ObjectId
 from typing import Union
 from pydantic.fields import Schema
 from pydantic.main import BaseModel
-from app.models.tool.build.common import AuthType, AuthNone, AuthCredentials, AuthToken, AuthSsh, BaseBuildModel, BuildType
+from app.models.tool.build.common import AuthType, AuthNone, AuthCredentials, AuthToken, AuthSsh, BaseBuildModel, BaseBuildModelInResponse, BuildType
 
 
 
@@ -29,10 +29,10 @@ class DockerPublicBuild(BaseModel):
     config: DockerPublicBuildConfig
 
 
-class DockerPublicUrlInBase(BaseBuildModel):
+class DockerPublicUrlInBase(BaseBuildModelInResponse):
     auth: Union[DockerPublicAuthNone, DockerPublicAuthCredentials ]
     build: DockerPublicBuild
-    refrence_id: str
+    
 
 
 

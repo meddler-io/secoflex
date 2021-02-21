@@ -1,3 +1,4 @@
+from app.models.dbmodel import DBModelMixin
 from typing import Optional, List, Dict
 from fastapi.exceptions import HTTPException
 from google.auth.environment_vars import CREDENTIALS
@@ -91,8 +92,7 @@ class BuildConfig(BaseModel):
     system: Dict[str, Any] = dict()
 
 
-class BuildMessageSpec(BaseModel):
-    id: str
+class BuildMessageSpec(DBModelMixin):
     entrypoint: List[str] = list()
     cmd: str
     args: List[str] = list()

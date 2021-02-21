@@ -4,7 +4,7 @@ from app.models.mongo_id import ObjectId
 from typing import Union
 from pydantic.fields import Schema
 from pydantic.main import BaseModel
-from app.models.tool.build.common import AuthType, AuthNone, AuthCredentials, AuthToken, AuthSsh, BaseBuildModel, BuildType
+from app.models.tool.build.common import AuthType, AuthNone, AuthCredentials, AuthToken, AuthSsh, BaseBuildModel, BaseBuildModelInRequest, BaseBuildModelInResponse, BuildType
 
 
 class BundleAuthNone(BaseModel):
@@ -25,17 +25,21 @@ class BundleBuild(BaseModel):
 class BundleUrlInBase(BaseBuildModel):
     auth: Union[BundleAuthNone]
     build: BundleBuild
-    refrence_id: str
+    
+
+class BundleUrlInReq(BaseBuildModelInRequest):
+    auth: Union[BundleAuthNone]
+    build: BundleBuild
+    
+
+
+class BundleUrlInResp(BaseBuildModelInResponse):
+    auth: Union[BundleAuthNone]
+    build: BundleBuild
+    
 
 
 
 class BundleUrlInDB(BundleUrlInBase):
     pass
 
-
-class BundleUrlInReq(BundleUrlInBase):
-    pass
-
-
-class BundleGitInResp(BundleUrlInDB):
-    pass

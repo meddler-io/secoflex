@@ -82,7 +82,7 @@ build_executor_collection_name = "builds_executor"
 
 
 # Webhooks
-API_PREFIX_WEBHOOK = "http://192.168.29.6:8000/api/v2"
+API_PREFIX_WEBHOOK = "http://192.168.29.7:8000/api/v2"
 SUCCESS_EXECUTION_WEBHOOK = f"{API_PREFIX_WEBHOOK}/result/success/%s"
 FAILURE_EXECUTION_WEBHOOK = f"{API_PREFIX_WEBHOOK}/result/failure/%s"
 

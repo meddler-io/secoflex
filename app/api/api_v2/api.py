@@ -8,6 +8,8 @@ from .endpoints.test import router as test_router
 from .endpoints.tools import router as tools_router
 from .endpoints.builds import router as builds_router
 from .endpoints.result import router as builds_result_router
+from .endpoints.deployments import router as deployment_router
+from .endpoints.job import router as job_router
 
 
 router = APIRouter()
@@ -18,6 +20,8 @@ router.include_router(asset_router, prefix='/v2')
 router.include_router(tools_router, prefix='/v2')
 router.include_router(builds_router, prefix='/v2')
 router.include_router(builds_result_router, prefix='/v2')
+router.include_router(deployment_router, prefix='/v2')
+router.include_router(job_router, prefix='/v2')
 
 # Test router
 router.include_router(test_router)

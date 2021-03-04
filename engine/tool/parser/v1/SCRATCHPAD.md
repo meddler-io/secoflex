@@ -27,3 +27,35 @@ Tools:
         ouput:
             multi: boolean
             indexed: boolean
+
+
+<!-- Config -->
+<!-- TODO -->
+
+
+<!-- Input  -->
+Dependencies:
+IP
+    Single
+    Multiple
+        Max. Limit:
+        Seperator: '\n' , ',' , JSON, CSV, Arrat
+     
+
+
+Domain
+    Single
+    Multiple
+
+
+Subdomain
+URL
+APK
+IPA
+
+
+
+
+
+$IP_ADDRESS
+$

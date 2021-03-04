@@ -4,7 +4,7 @@ from slugify import slugify
 from datetime import datetime
 
 from ..models.tool.tool import (
-    ToolInDB, ToolInReq, ToolInResp
+    ToolInDB, ToolInReq, ToolInResp, ToolModifyInReq
 )
 
 
@@ -28,11 +28,26 @@ async def create_tool(client: AsyncIOMotorClient, tool: ToolInReq) -> ToolInResp
     field_data = await collection_asset.find_one({"_id":  inserted_id})
     return field_data
 
+# Tool
+
+
+async def edit_tool(client: AsyncIOMotorClient, tool_id: str, tool: ToolModifyInReq) -> ToolInResp:
+
+    tool_id = ObjectId(tool_id)
+    collection_asset = client[database_name][coll_name]
+    row = await collection_asset.update_one({"_id": tool_id}, {"$set": ToolInDB(**tool.dict()).dict()})
+    if row == None:
+        raise ValueError("Unable to create tool")
+
+    field_data = await collection_asset.find_one({"_id":  tool_id})
+    return field_data
+
 
 async def get_tool(client: AsyncIOMotorClient, id: str) -> ToolInResp:
     collection_asset = client[database_name][coll_name]
     field_data = await collection_asset.find_one({"_id": ObjectId(id)})
-    return field_data
+
+    return ToolInResp(**field_data)
 
 
 async def get_tools(client: AsyncIOMotorClient) -> List[ToolInResp]:
@@ -44,4 +59,3 @@ async def get_tools(client: AsyncIOMotorClient) -> List[ToolInResp]:
     async for row in rows:
         result.append(row)
     return result
-

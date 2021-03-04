@@ -25,6 +25,10 @@ def parseBuild(build_from_db: BaseBuildModel):
     env["base_path"] = "/kaniko/fs"
     env["input_dir"] = "/input"
 
+    env["BUILDCONTEXT"] = ""
+    env["BUILDSUBCONTEXT"] = ""
+
+
     result = build_from_db
 
 
@@ -42,6 +46,8 @@ def parseBuild(build_from_db: BaseBuildModel):
         
         build = bundle_git.GitUrlInDB(**result.dict())
         env["BUILDCONTEXT"] = build.build.config.repository_url
+        env["BUILDSUBCONTEXT"] = build.build.config.repository_context
+
         if build.auth.mode == AuthType.NONE:
             pass
         elif build.auth.mode == AuthType.CREDENTIALS:

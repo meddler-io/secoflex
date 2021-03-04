@@ -79,11 +79,30 @@ asset_docker_collection_name = "asset_docker"
 tools_collection_name = "tools"
 build_collection_name = "builds"
 build_executor_collection_name = "builds_executor"
+job_collection_name = "jobs"
 
 
 # Webhooks
-API_PREFIX_WEBHOOK = "http://192.168.29.7:8000/api/v2"
+API_PREFIX_WEBHOOK = "http://192.168.29.10:8000/api/v2"
 SUCCESS_EXECUTION_WEBHOOK = f"{API_PREFIX_WEBHOOK}/result/success/%s"
 FAILURE_EXECUTION_WEBHOOK = f"{API_PREFIX_WEBHOOK}/result/failure/%s"
 
+# Job Webhhoks
+JOB_SUCCESS_EXECUTION_WEBHOOK = f"{API_PREFIX_WEBHOOK}/job/result/success/%s"
+JOB_FAILURE_EXECUTION_WEBHOOK = f"{API_PREFIX_WEBHOOK}/job/result/failure/%s"
+
+# Provider
+NOMAD_API_ENDPOINT = "http://192.168.29.5:4646/v1"
+NOMAD_API_JOBS = f"{NOMAD_API_ENDPOINT}/jobs"
+NOMAD_API_JOB = f"{NOMAD_API_ENDPOINT}/job"
+NOMAD_API_GC = f"{NOMAD_API_ENDPOINT}/system/gc"
+NOMAD_API_SEARCH = f"{NOMAD_API_ENDPOINT}/search"
+# DOCKER BASE URL
+DOCKER_ENDPOINT = "192.168.29.5:5000"
+DOCKER_API_CATALOG = f"http://{DOCKER_ENDPOINT}/v2/_catalog"
+
+# 
+DOCKER_DEFAULT_NAMESPACE = "rounak316"
+# Docker Private Registry
+DOCKER_PRIVATE_REGISTRY = "192.168.29.5:5000/{}:{}"
 

@@ -94,7 +94,7 @@ class BuildConfig(BaseModel):
 
 class BuildMessageSpec(DBModelMixin):
     entrypoint: List[str] = list()
-    cmd: str
+    cmd: List[str] = list()
     args: List[str] = list()
     substitute_var: bool
     variables: Dict[str, str] = dict()

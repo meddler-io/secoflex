@@ -28,6 +28,7 @@ class GitAuthToken(BaseModel):
 class GitBuildConfig(BaseModel):
     repository: str
     repository_url: str
+    repository_context: str = ""
 
 
 class GitBuild(BaseModel):

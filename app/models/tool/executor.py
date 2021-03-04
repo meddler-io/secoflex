@@ -1,3 +1,5 @@
+from app.models.tool.integrated.docker_build import DockerImageSpec
+from app.models.tool.toobuilder import ToolInResp
 from pydantic.fields import Schema
 from .builds import BuildMessageSpec
 from typing import Optional, List, Dict
@@ -23,7 +25,8 @@ class ExecutionStatus(str, Enum):
 
 
 class BuildExecutorInBase(BuildMessageSpec):
-    pass
+    result: Optional[DockerImageSpec]
+
 
 
 class BuildExecutorInRequest(BuildExecutorInBase):
@@ -31,15 +34,31 @@ class BuildExecutorInRequest(BuildExecutorInBase):
     exec_status: Optional[ExecutionStatus] = ExecutionStatus.UNKNOWN
 
 
-
 class BuildExecutorInDb(BuildExecutorInBase):
     refrence_id: ObjectId = Schema(None, alias="refrence_id")
     exec_status: ExecutionStatus = ExecutionStatus.ENQUEUED
 
 
-
 class BuildExecutorInResponse(BuildExecutorInBase):
     refrence_id: ObjectId = Schema(None, alias="refrence_id")
     exec_status: Optional[ExecutionStatus] = ExecutionStatus.UNKNOWN
+    tool: ToolInResp = Schema(None, alias="tool")
 
-    pass
+
+class BuildExecutorCompositeInResponse(BuildExecutorInBase):
+    refrence_id: ObjectId = Schema(None, alias="refrence_id")
+    exec_status: Optional[ExecutionStatus] = ExecutionStatus.UNKNOWN
+    tool: ToolInResp = Schema(None, alias="tool")
+    build_id: ObjectIdInRes = Schema(None, alias="_build_id")
+    tool_id:  ObjectIdInRes = Schema(None, alias="_tool_id")
+
+    # image_name: Optional[ str]
+    # tag_name: Optional[ ObjectIdInRes]
+
+
+
+
+class BuildExecutorDeploymentStructure(BaseModel):
+    image_name: str
+    id: ObjectIdInRes
+    tag_name: ObjectIdInRes

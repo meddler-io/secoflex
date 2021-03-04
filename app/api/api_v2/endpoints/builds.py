@@ -102,12 +102,14 @@ async def api_run_build(
 ):
     try:
         result = await get_build(db,  id)
+        image_name = result.tool.alias
+        image_tag = 'latest'
         result = parseBuild(result)
         build_config = await get_build_config(db,  id)
 
         Config = await create_build_executor(db, id, build_config)
-        print("Tag", Config.id)
-        Config.cmd = "/kaniko/executor"
+        image_tag = Config.id
+        Config.cmd = ["/kaniko/executor"]
         Config.success_endpoint = SUCCESS_EXECUTION_WEBHOOK % Config.id
         Config.failure_endpoint = FAILURE_EXECUTION_WEBHOOK % Config.id
         Config.config.system["input_dir"] = result["env"]["input_dir"]
@@ -116,12 +118,20 @@ async def api_run_build(
 
         # Config.config.system["DOCKER_CONFIG"] = "/kaniko/fs/input/configmaps/"
         Config.environ["DOCKER_CONFIG"] = "$input_dir/configmaps/"
+        # Config.environ["__TOPIC__"] = "HELLO_new_topic_HELLO"
+        Config.environ["message_queue_topic"] = f"{image_name}:{image_tag}"
+        
+
+
 
         # Substutute env variables
         for key in result["env"]:
             Config.environ[key] = result["env"][key]
 
         BuildContext = result["env"]["BUILDCONTEXT"]
+        BuildSubContext = result["env"]["BUILDSUBCONTEXT"]
+        
+
         Config.substitute_var = True
         Config.variables = {
             "input_dir": "$input_dir"
@@ -139,9 +149,12 @@ async def api_run_build(
             }
         ]
 
-        Config.args = ["--context=" + f"{BuildContext}",
-                       f"--destination=192.168.29.5:5000/rounak316/hello:{Config.id}",
+        Config.args = [
+            "--context=" + f"{BuildContext}",
+            "--context-sub-path=" + f"{BuildSubContext}",
+                       f"--destination=192.168.29.5:5000/rounak316/{image_name}:{image_tag}",
                        "--cache=false",
+                       "--cache-dir=$input_dir/cache",
                        "--cleanup",
 
 

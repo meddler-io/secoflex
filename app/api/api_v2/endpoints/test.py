@@ -1,7 +1,6 @@
 import asyncio
 import aio_pika
 import logging
-from engine.integrations import produce_data
 from engine import integrations
 from fastapi import APIRouter
 from typing import Dict

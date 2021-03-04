@@ -5,8 +5,8 @@ from ....core.utils import save_upload_file
 from fastapi import APIRouter, Body, Depends, HTTPException
 from ....db.mongodb import AsyncIOMotorClient, get_database
 from starlette.responses import FileResponse
-from ....models.tool.tool import ToolInReq, ToolInResp
-from ....crud.tools import get_tool, get_tools, create_tool
+from ....models.tool.tool import ToolInReq, ToolInResp, ToolModifyInReq
+from ....crud.tools import edit_tool, get_tool, get_tools, create_tool
 
 from typing import Dict
 from engine.integrations import rmq
@@ -30,6 +30,21 @@ async def api_create_tool(
 ):
 
     response = await create_tool(db, tool)
+    return response
+
+
+# Edit Tol
+@router.put("/tool/{id}", tags=["tool"],
+            response_model=ToolInResp
+
+            )
+async def api_edit_tool(
+        id: str,
+        db: AsyncIOMotorClient = Depends(get_database),
+        tool: ToolModifyInReq = Body(...,),
+):
+
+    response = await edit_tool(db, id, tool)
     return response
 
 
@@ -76,13 +91,9 @@ async def api_run_toolbuilder(
 
 ):
     try:
-        response = await asyncio.wait_for(rmq.RMQ.publish( "tasks_test",  json.dumps(data)), timeout=4)
+        response = await asyncio.wait_for(rmq.RMQ.publish("tasks_test",  json.dumps(data)), timeout=4)
         return response
     except:
         return False
 
     # return True
-
-
-
-

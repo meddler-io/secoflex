@@ -1,4 +1,5 @@
 # from app.models.mongo_id import ObjectId
+from app.models.tool.executor import BuildExecutorInResponse
 from app.models.tool.tool import ToolInResp
 from app.models.mongo_id import ObjectIdInReq
 from app.models.tool.builds import BuildMessageSpec
@@ -52,7 +53,7 @@ class AuthModel():
     auth: Union[AuthNone, AuthCredentials, AuthToken, AuthSsh]
 
 
-# 
+#
 
 class BuildType(str, Enum):
     REGISTRY_PUBLIC = 'registry_public'  # Will focus on this only for now
@@ -61,7 +62,6 @@ class BuildType(str, Enum):
     BUNDLE_URL = 'bundle_url'
     BUNDLE_UPLOAD = 'bundle_upload'
     DOCKERFILE = 'dockerfile'
-
 
 
 class BaseAuthModel(BaseModel):
@@ -74,20 +74,28 @@ class BaseBuildConfigModel(BaseModel):
     config: Any
 
 
+class BuildMetaData(BaseModel):
+    tags: List[str]
+
+
 class BaseBuildModel(DBModelMixin):
     auth: BaseAuthModel
     build: BaseBuildConfigModel
     refrence_id: ObjectId = Schema(None, alias="refrence_id")
     build_config: Optional[BuildMessageSpec]
 
+    # Meta
+    meta: Optional[BuildMetaData]
+
+
 class BaseBuildModelInResponse(BaseBuildModel):
     pass
+
 
 class BaseBuildModelInRequest(BaseBuildModel):
     pass
 
+
 class BaseBuildWithToolModelInResponse(BaseBuildModel):
     tool: ToolInResp
-
-
-
+    executors: Optional[List[BuildExecutorInResponse]]

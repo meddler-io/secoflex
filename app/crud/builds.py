@@ -3,7 +3,7 @@ from app.models.mongo_id import ObjectIdInReq, ObjectIdInRes, BsonObjectId
 from app.models.tool.builds import BuildMessageSpec
 from app.models.tool.build.common import BaseBuildModel, BaseBuildModelInRequest, BaseBuildModelInResponse, BaseBuildWithToolModelInResponse, BuildType
 
-from app.models.tool.executor import BuildExecutorCompositeInResponse, BuildExecutorDeploymentStructure, BuildExecutorInDb, BuildExecutorInRequest, BuildExecutorInResponse, ExecutionStatus
+from app.models.tool.executor import BuildExecutorCompositeInResponse, BuildExecutorDeploymentStructure, BuildExecutorInDb, BuildExecutorInRequest, BuildExecutorInResponse, BuildExecutorProgressResponse, ExecutionStatus
 from logging import log
 import logging
 from typing import Any, List, Optional
@@ -288,9 +288,11 @@ async def get_build_executor_for_image_tag(client: AsyncIOMotorClient,  image_ta
 
 async def get_all_build_executor_for_image_tags(client: AsyncIOMotorClient, tool_id: str, image_tags: List[str]) -> List[BuildExecutorCompositeInResponse]:
 
+
     collection = client[database_name][exec_coll_name]
     for index, _id in enumerate(image_tags):
         image_tags[index] = ObjectId(_id)
+        print(image_tags[index])
 
     rows = collection.aggregate([
         {
@@ -364,6 +366,16 @@ async def get_build_executor(client: AsyncIOMotorClient, build_executor_id: str)
     result = await collection.find_one({"_id":  ObjectId(build_executor_id)}, )
     result = BuildExecutorInResponse(**result)
 
+    return result
+
+
+async def get_build_executor_status(client: AsyncIOMotorClient, build_executor_id: str) -> BuildExecutorProgressResponse:
+
+    collection = client[database_name][exec_coll_name]
+    print("Finding", build_executor_id)
+    result = await collection.find_one({"_id":  ObjectId(build_executor_id)}, )
+    print("res", result)
+    result = BuildExecutorProgressResponse(**result)
     return result
 
 

@@ -1,4 +1,4 @@
-import traceback 
+import traceback
 from engine.integrations.services.build import parseBuild
 from app.models.tool.build.common import BaseBuildModel
 from app.models.tool.build.bundle_upload import BundleUploadInBase
@@ -11,7 +11,7 @@ from ....core.config import FAILURE_EXECUTION_WEBHOOK, FILESTORAGE_PATH, SUCCESS
 from fastapi import APIRouter, Body, Depends
 from ....db.mongodb import AsyncIOMotorClient, get_database
 from ....models.tool.builds import BuildMessageSpec
-from ....crud.builds import create_build, create_build_executor, edit_build, get_all_build, get_all_build_executor, get_build, update_build_config, get_build_config
+from ....crud.builds import create_build, create_build_executor, edit_build, get_all_build, get_all_build_executor, get_build, get_build_executor, get_build_executor_status, update_build_config, get_build_config
 from engine.integrations import rmq
 from bson import json_util
 from engine.integrations.minio import generate_download_url, generate_upload_url
@@ -120,9 +120,6 @@ async def api_run_build(
         Config.environ["DOCKER_CONFIG"] = "$input_dir/configmaps/"
         # Config.environ["__TOPIC__"] = "HELLO_new_topic_HELLO"
         Config.environ["message_queue_topic"] = f"{image_name}:{image_tag}"
-        
-
-
 
         # Substutute env variables
         for key in result["env"]:
@@ -130,7 +127,6 @@ async def api_run_build(
 
         BuildContext = result["env"]["BUILDCONTEXT"]
         BuildSubContext = result["env"]["BUILDSUBCONTEXT"]
-        
 
         Config.substitute_var = True
         Config.variables = {
@@ -152,14 +148,14 @@ async def api_run_build(
         Config.args = [
             "--context=" + f"{BuildContext}",
             "--context-sub-path=" + f"{BuildSubContext}",
-                       f"--destination=192.168.29.5:5000/rounak316/{image_name}:{image_tag}",
-                       "--cache=false",
-                       "--cache-dir=$input_dir/cache",
-                       "--cleanup",
+            f"--destination=192.168.29.5:5000/rounak316/{image_name}:{image_tag}",
+            "--cache=false",
+            "--cache-dir=$input_dir/cache",
+            "--cleanup",
 
 
 
-                       ]
+        ]
 
         print("SUCCESS_EXECUTION_WEBHOOK", Config.success_endpoint)
         print("FAILURE_EXECUTION_WEBHOOK", Config.failure_endpoint)
@@ -185,7 +181,7 @@ async def api_run_build(
         return config
     except Exception as err:
         print(err)
-        traceback.print_exc() 
+        traceback.print_exc()
         return {"error": str(err)}
 
     return True
@@ -360,3 +356,17 @@ async def api_edit_public_registry(
 ):
     data = await edit_build(db,  build_id,  data)
     return data
+
+
+# Job Status Polling
+
+@router.get("/build/executors/status/{job_id}",
+            tags=["job"],
+            )
+async def api_build_executor_status(
+        job_id: str,
+        db: AsyncIOMotorClient = Depends(get_database),
+
+):
+
+    return await get_build_executor_status(db, job_id)

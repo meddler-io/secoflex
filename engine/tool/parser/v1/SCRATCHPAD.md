@@ -59,3 +59,13 @@ IPA
 
 $IP_ADDRESS
 $
+
+
+<!-- Installation -->
+
+Install docker
+Pull Stack repo
+Check permssion in /volumes
+    sudo chmod a+rwx -R /volumes/
+Whitelist insecure docker registry
+Up dock compose

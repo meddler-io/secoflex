@@ -1,6 +1,7 @@
 
+from app.crud import job
 from app.models.tool.executor import ExecutionStatus
-from typing import Any, Optional
+from typing import Any, List, Optional
 import json
 from pydantic.types import Json
 from app.models.mongo_id import ObjectId
@@ -9,8 +10,8 @@ import asyncio
 from app.models.tool.builds import BuildMessageSpec
 from app.crud.builds import get_build_by_refrence_id
 from app.models.tool.deployments import GetBuilExecutordIdFromJobId, GetToolIdFromJobId
-from app.models.tool.job import JobInRequest, JobRequestModel, JobUpdateModel
-from app.crud.job import create_job, get_jobs, update_job
+from app.models.tool.job import JobInRequest, JobInResponse, JobRequestModel, JobUpdateModel
+from app.crud.job import create_job, get_al_jobs, get_job_status, get_jobs, update_job
 from fastapi import APIRouter, Body, Depends, HTTPException, Request
 from ....db.mongodb import AsyncIOMotorClient, get_database
 from engine.integrations import rmq
@@ -51,7 +52,7 @@ async def api_create_job(
 
     build_details = build_details.result
 
-    Config.cmd = build_details.Cmd
+    # Config.cmd = build_details.Cmd
     Config.entrypoint = build_details.Entrypoint
 
     embedded_env = build_details.Env
@@ -69,14 +70,28 @@ async def api_create_job(
     return Config
 
 
-@router.get("/job",
+@router.get("/jobs",
             tags=["job"],
             )
-async def api_get_jobs(
+async def api_all_get_jobs(
         db: AsyncIOMotorClient = Depends(get_database),
 
-):
-    result = await get_jobs(db)
+) -> List[JobInResponse]:
+    result = await get_al_jobs(db)
+
+    return result
+
+
+
+@router.get("/jobs/{tool_id}",
+            tags=["job"],
+            )
+async def api_get_jobs_by_tool(
+        tool_id: str,
+        db: AsyncIOMotorClient = Depends(get_database),
+
+) -> List[JobInResponse]:
+    result = await get_jobs(db, tool_id)
 
     return result
 
@@ -98,7 +113,7 @@ async def api_webhook_succes_job(
     except:
         pass
     result = JobUpdateModel(response=result)
-    result = await update_job(db, job_id,  result, ExecutionStatus.FAILURE)
+    result = await update_job(db, job_id,  result, ExecutionStatus.SUCCESS)
     return result
 
 
@@ -120,3 +135,17 @@ async def api_webhook_failure_job(
     result = JobUpdateModel(response=result)
     result = await update_job(db, job_id,  result, ExecutionStatus.FAILURE)
     return result
+
+
+# Job Status Polling
+
+@router.get("/job/status/{job_id}",
+            tags=["job"],
+            )
+async def api_job_status(
+        job_id: str,
+        db: AsyncIOMotorClient = Depends(get_database),
+
+):
+
+    return await get_job_status(db, job_id)

@@ -1,7 +1,7 @@
 
 
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel , validator
 from pydantic.fields import Schema
 
 
@@ -21,6 +21,21 @@ class DockerImageSpec(BaseModel):
     NetworkDisabled: Optional[bool] = Schema(None, alias="NetworkDisabled")
     StopSignal: Optional[str] = Schema(None, alias="StopSignal")
     Shell: Optional[List[str]] = Schema(None, alias="Shell")
+
+
+    class Config:
+        validate_assignment = True
+    
+    @validator('Cmd')
+    def set_cmd(cls, value):
+        return value or [""]
+
+    @validator('Entrypoint')
+    def set_env(cls, value):
+        return value or [""]
+
+
+    
 
     
     

@@ -243,6 +243,7 @@ async def api_get_deployment_images(
         DOCKER_API_TAGS = f"http://{DOCKER_ENDPOINT}/v2/{image_name}/tags/list"
         print(DOCKER_API_TAGS)
         tags = requests.get(DOCKER_API_TAGS).json()["tags"]
+        print(tags)
         return await get_all_build_executor_for_image_tags(db, tool_id, tags)
 
     except Exception as err:

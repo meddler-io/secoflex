@@ -42,6 +42,8 @@ class JobInRequest(BaseModel):
 class JobInDb(DBModelMixin):
     refrence_id: ObjectId
     response: Optional[Any]
+    doc: Optional[datetime] = datetime.utcnow()
+    dou: Optional[datetime] = datetime.utcnow()
     exec_status: ExecutionStatus = ExecutionStatus.ENQUEUED
     request: JobRequestModel
     response: Optional[Any]
@@ -51,10 +53,15 @@ class JobInResponse(JobInDb):
     refrence_id: ObjectIdInRes = Schema(None, alias="refrence_id")
 
 
-class JobCompositeInResponse(BaseModel):
-    job: JobInResponse
+class JobCompositeInResponse(JobInResponse):
+    # tool_id: ObjectIdInRes = Schema(None, alias="tool_id")
+    tool: Optional[ ToolInResp ]
+
+
+    pass
+    # job: JobInResponse
     # exec: BuildExecutorInResponse
-    build: BaseBuildInResponse
+    # build: BaseBuildInResponse
 
 
 class JobUpdateModel(BaseModel):

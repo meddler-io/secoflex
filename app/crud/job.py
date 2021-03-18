@@ -2,7 +2,7 @@
 from motor.frameworks.asyncio import pymongo_class_wrapper
 from app.api.api_v2.endpoints import job
 from typing import Any, List
-from app.models.tool.job import JobInDb, JobInRequest, JobInResponse, JobProgressResponse, JobUpdateModel
+from app.models.tool.job import JobCompositeInResponse, JobInDb, JobInRequest, JobInResponse, JobProgressResponse, JobUpdateModel
 
 
 from app.models.mongo_id import ObjectIdInReq, ObjectIdInRes, BsonObjectId
@@ -45,11 +45,97 @@ async def update_job(client: AsyncIOMotorClient, job_id: str, job:  JobUpdateMod
 
 
 # JobInResponse
-async def get_jobs(client: AsyncIOMotorClient, id: str) -> List[JobInResponse]:
+async def get_job_by_id(client: AsyncIOMotorClient, job_id: str) -> JobCompositeInResponse:
+
+    collection = client[database_name][coll_name]
+
+    rows = collection.aggregate(
+
+        [
+            {
+                "$match": {
+                    "_id": BsonObjectId(job_id)
+                }
+            },
+
+
+            {
+                "$lookup": {
+                    "from": build_executor_collection_name,
+                    "localField": "refrence_id",
+                    "foreignField": "_id",
+                    "as": "tool"
+                }
+            },
+
+            {
+                "$set": {
+                    "tool": {"$arrayElemAt": ["$tool", 0]}
+                }
+            },
+
+            {
+                "$set": {
+                    "tool": "$tool.refrence_id",
+                }
+            },
+            #
+
+
+            {
+                "$lookup": {
+                    "from": build_collection_name,
+                    "localField": "tool",
+                    "foreignField": "_id",
+                    "as": "tool"
+                }
+            },
+
+            {
+                "$set": {
+                    "tool": {"$arrayElemAt": ["$tool", 0]}
+                }
+            },
+
+
+            {
+                "$lookup": {
+                    "from": tools_collection_name,
+                    "localField": "tool.refrence_id",
+                    "foreignField": "_id",
+                    "as": "tool"
+                }
+            },
+
+            {
+                "$set": {
+                    "tool": {"$arrayElemAt": ["$tool", 0]}
+                }
+            },
+
+            {"$limit": 1}
+
+
+        ])
+
+    async for row in rows:
+        row = JobCompositeInResponse(**row)
+        # row = str(row)
+        # row["_id"] = str(row["_id"])
+        # row["refrence_id"] = str(row["refrence_id"])
+
+        return row
+
+    raise Exception("Not found")
+
+
+# JobInResponse
+async def get_jobs(client: AsyncIOMotorClient, id: str) -> List[JobCompositeInResponse]:
 
     collection = client[database_name][build_collection_name]
     result:  List[Any] = []
     rows = collection.aggregate([
+
 
         {
             "$match": {
@@ -72,6 +158,7 @@ async def get_jobs(client: AsyncIOMotorClient, id: str) -> List[JobInResponse]:
         {
             "$project": {
                 "_id": "$executors._id",
+                "tool_ref_id": "$refrence_id",
             }
         },
         {
@@ -85,31 +172,58 @@ async def get_jobs(client: AsyncIOMotorClient, id: str) -> List[JobInResponse]:
         {
             "$unwind": "$job"
         },
+
+        #
+
+
+        {
+            "$lookup": {
+                "from": tools_collection_name,
+                "localField": "tool_ref_id",
+                "foreignField": "_id",
+                "as": "tool"
+            }
+        },
+
+        {
+            "$set": {
+                "tool": {"$arrayElemAt": ["$tool", 0]}
+            }
+        },
+        #
+
+
+
+        {
+            "$set": {
+                "job.tool": "$tool"
+            }
+        },
         {
             "$replaceRoot":
             {
                 "newRoot": "$job"
             }
         },
-        {"$sort": {"_id": -1}}
+        {"$sort": {"_id": -1}},
 
 
     ])
     async for row in rows:
-        row = JobInResponse(**row)
+        row = JobCompositeInResponse(**row)
         result.append(row)
 
     return result
 
 
 # JobInResponse
-async def get_al_jobs(client: AsyncIOMotorClient) -> List[JobInResponse]:
+async def get_al_jobs(client: AsyncIOMotorClient) -> List[JobCompositeInResponse]:
 
     collection = client[database_name][build_collection_name]
     result:  List[Any] = []
     rows = collection.aggregate([
 
-    
+
 
         {
             "$lookup": {
@@ -126,6 +240,7 @@ async def get_al_jobs(client: AsyncIOMotorClient) -> List[JobInResponse]:
         {
             "$project": {
                 "_id": "$executors._id",
+                "tool_ref_id": "$refrence_id",
             }
         },
         {
@@ -139,6 +254,33 @@ async def get_al_jobs(client: AsyncIOMotorClient) -> List[JobInResponse]:
         {
             "$unwind": "$job"
         },
+
+        #
+
+
+        {
+            "$lookup": {
+                "from": tools_collection_name,
+                "localField": "tool_ref_id",
+                "foreignField": "_id",
+                "as": "tool"
+            }
+        },
+
+        {
+            "$set": {
+                "tool": {"$arrayElemAt": ["$tool", 0]}
+            }
+        },
+        #
+
+
+
+        {
+            "$set": {
+                "job.tool": "$tool"
+            }
+        },
         {
             "$replaceRoot":
             {
@@ -150,7 +292,7 @@ async def get_al_jobs(client: AsyncIOMotorClient) -> List[JobInResponse]:
 
     ])
     async for row in rows:
-        row = JobInResponse(**row)
+        row = JobCompositeInResponse(**row)
         result.append(row)
 
     return result

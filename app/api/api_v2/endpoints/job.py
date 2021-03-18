@@ -11,7 +11,7 @@ from app.models.tool.builds import BuildMessageSpec
 from app.crud.builds import get_build_by_refrence_id
 from app.models.tool.deployments import GetBuilExecutordIdFromJobId, GetToolIdFromJobId
 from app.models.tool.job import JobInRequest, JobInResponse, JobRequestModel, JobUpdateModel
-from app.crud.job import create_job, get_al_jobs, get_job_status, get_jobs, update_job
+from app.crud.job import create_job, get_al_jobs, get_job_by_id, get_job_status, get_jobs, update_job
 from fastapi import APIRouter, Body, Depends, HTTPException, Request
 from ....db.mongodb import AsyncIOMotorClient, get_database
 from engine.integrations import rmq
@@ -68,6 +68,22 @@ async def api_create_job(
 
     result = await asyncio.wait_for(rmq.RMQ.publish(job_id,  Config.json()), timeout=10)
     return Config
+
+
+
+@router.get("/job/{job_id}",
+            tags=["job"],
+            )
+async def api_get_job_by_id(
+        job_id: str,
+
+        db: AsyncIOMotorClient = Depends(get_database),
+
+) -> List[JobInResponse]:
+    result = await get_job_by_id(db, job_id)
+
+    return result
+
 
 
 @router.get("/jobs",
